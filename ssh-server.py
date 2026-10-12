@@ -8,7 +8,7 @@ port = 2222
 
 prevConnections = []
 known_users = []
-
+game_players = []
 
 async def handle_client(proccess: asyncssh.SSHServerProcess):
     username = proccess.get_extra_info("username")
@@ -30,6 +30,8 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
         print(f"New user {username}!")
 
         known_users.append(prevConnections[len(prevConnections) - 1])
+
+        
 
     
     #proccess.exit(0)
