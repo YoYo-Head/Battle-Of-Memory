@@ -5,9 +5,13 @@ from typing import Optional
 
 port = 2222
 
+accounts = {
+    "normal_user": b"",
+}
+
 async def handle_client(proccess: asyncssh.SSHServerProcess):
     username = proccess.get_extra_info("username")
-    proccess.stdout.write(f"Hello {username}! Welcome to \n BATTLE OF MEMORY \n By Yahya :)")
+    proccess.stdout.write(f"Hello {username}! Welcome to \n BATTLE OF MEMORY \n By Yahya :) \n")
     proccess.exit(0)
 
 class Server(asyncssh.SSHServer):
@@ -20,6 +24,15 @@ class Server(asyncssh.SSHServer):
             print("SSH connection error: " + str(exc), file=sys.stderr)
         else:
             print("SSH connection lost.")
+
+    def begin_auth(self, username):
+        return False
+
+    def password_auth_supported(self):
+        return True
+
+    def validate_password(self, username, password):
+        return True
 
 async def start_server():
     await asyncssh.create_server(Server, "", port, server_host_keys=["ssh_host_key"], process_factory=handle_client)
