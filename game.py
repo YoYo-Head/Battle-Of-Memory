@@ -20,7 +20,7 @@ class Army:
 
     def attack_base(self, base: Base):
         if base.owner == self.owner:
-            self.owner.proccess.stdout("You can't attack your own base!")
+            self.owner.proccess.stdout.write("You can't attack your own base!")
             return
 
         if base.owner == None:
@@ -33,7 +33,7 @@ class Army:
 
         sInfantry_lost = self.take_damage(enemy_army.infantry, base.owner)
 
-        self.owner.proccess.stdin(f"Your army killed {eInfantry_lost} infantry.\nYour lost {sInfantry_lost} infantry.")
+        self.owner.proccess.stdout.write(f"Your army killed {eInfantry_lost} infantry.\nYour lost {sInfantry_lost} infantry.")
 
 
 

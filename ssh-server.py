@@ -39,9 +39,9 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
     player = game.User(proccess, playerInfo["key"])
 
     async for line in proccess.stdin:
-        print(type(line))
+        incoming_message = line.lower().strip()
 
-        if line.lower().strip() == "contest eax":
+        if incoming_message == "contest eax":
             print("attack!")
             try:
                 player.attack(eax_base)
