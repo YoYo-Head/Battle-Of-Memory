@@ -3,12 +3,15 @@ import asyncio
 import sys
 import game
 from typing import Optional
+import traceback
 
 port = 2222
 
 prevConnections = []
 known_users = []
 game_players = []
+
+eax_base = game.Base("EAX")
 
 async def handle_client(proccess: asyncssh.SSHServerProcess):
     username = proccess.get_extra_info("username")
@@ -31,8 +34,19 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
 
         known_users.append(prevConnections[len(prevConnections) - 1])
 
-        
+    playerInfo = known_users[len(known_users) - 1]
 
+    player = game.User(proccess, playerInfo["key"])
+
+    async for line in proccess.stdin:
+        print(type(line))
+
+        if line.lower().strip() == "contest eax":
+            print("attack!")
+            try:
+                player.attack(eax_base)
+            except Exception:
+                traceback.print_exc()
     
     #proccess.exit(0)
 
