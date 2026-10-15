@@ -12,6 +12,23 @@ known_users = []
 game_players = []
 
 eax_base = game.Base("EAX")
+ebx_base = game.Base("EBX")
+ecx_base = game.Base("ECX")
+edx_base = game.Base("EDX")
+
+bases = [eax_base, ebx_base, ecx_base, edx_base]
+
+def assign_base() -> game.Base:
+    for base in bases:
+        if base.owner == None:
+            return base
+
+    return None
+
+def search_base_object(name: str) -> game.Base:
+    for base in bases:
+        if base.name.lower() == name.lower().strip():
+            return base
 
 async def handle_client(proccess: asyncssh.SSHServerProcess):
     username = proccess.get_extra_info("username")
@@ -36,15 +53,20 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
 
     playerInfo = known_users[len(known_users) - 1]
 
-    player = game.User(proccess, playerInfo["key"])
+    player = game.User(proccess, playerInfo["key"], home_base=assign_base())
+    player.claim_homebase()
 
     async for line in proccess.stdin:
         incoming_message = line.lower().strip()
 
-        if incoming_message == "contest eax":
-            print("attack!")
+        if "contest" in incoming_message:
+
+            name = incoming_message.replace("contest", "").strip()
+
+            base = search_base_object(name)
+
             try:
-                player.attack(eax_base)
+                player.attack(base)
             except Exception:
                 traceback.print_exc()
     
