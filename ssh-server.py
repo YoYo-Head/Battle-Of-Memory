@@ -4,6 +4,7 @@ import sys
 import game
 from typing import Optional
 import traceback
+import gc
 
 port = 2222
 
@@ -16,17 +17,28 @@ ebx_base = game.Base("EBX")
 ecx_base = game.Base("ECX")
 edx_base = game.Base("EDX")
 
-bases = [eax_base, ebx_base, ecx_base, edx_base]
+
+def get_all_instances(class_object):
+    instances = []
+
+    for object in gc.get_objects():
+        if isinstance(object, class_object):
+            instances.append(object)
+    return instances
 
 def assign_base() -> game.Base:
-    for base in bases:
-        if base.owner == None:
-            return base
+    try:
+        for base in get_all_instances(game.Base):
+            if base.owner == None:
+                return base
+
+    except Exception:
+        traceback.print_exc()
 
     return None
 
 def search_base_object(name: str) -> game.Base:
-    for base in bases:
+    for base in get_all_instances(game.Base):
         if base.name.lower() == name.lower().strip():
             return base
 
@@ -63,12 +75,46 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
 
             name = incoming_message.replace("contest", "").strip()
 
+            if name == "":
+                player.proccess.stdout.write("Please specify the name of the base you wish to attack!\n")
+                return
+
             base = search_base_object(name)
 
             try:
-                player.attack(base)
+                player.army.attack_base(base)
             except Exception:
                 traceback.print_exc()
+
+        if "buy infantry" in incoming_message:
+            data = incoming_message.replace("buy infantry", "").strip()
+
+            if data == "":
+                player.proccess.stdout.write("Please specify how many infantry you wish to buy!\n")
+                return
+
+            try:
+                amount = int(data)
+
+            except Exception:
+                player.proccess.stdout.write("Please only use integers!\n")
+                print("type failiar")
+                return
+
+            print(f"amount: {amount}")
+
+            try:
+                player.army.buy_infantry(amount)
+            except Exception:
+                traceback.print_exc()
+
+        if "balance" in incoming_message:
+            player.check_balance()
+
+        if "infantry" in incoming_message:
+            player.army.check_infantry()
+
+        
     
     #proccess.exit(0)
 
