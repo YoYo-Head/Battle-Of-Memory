@@ -10,10 +10,15 @@ Once you've loaded into the server, there is quite a few things you can do. Here
 
 - **contest [BASE_NAME]** -> Attacks that Base.
 - **balance** -> Show how much money you have.
-- **buy infantry** [AMOUNT]** -> Buys more infantry.
+- **buy infantry [AMOUNT]** -> Buys more infantry.
 - **infantry** -> Show how many infantry you have.
+- **bases** -> Shows all the bases in the game.
+- **armour level** -> Shows you level of armour.
+- **buy armour levels [AMOUNT]** -> Buys more armour levels.
+- **my bases** -> Shows the bases you own.
 
-As soon as you load you, you should automatically recieve a base (which will be referred to as your home base), $100 and 100 infantry.
+As soon as you load you, you should automatically recieve a base (which will be referred to as your home base), $100 and 100 infantry. Also,
+you should be getting $50 for every base you own per minute.
 
 # How it works
 This SSH server runs on Python through the *asyncssh* library. It allows anyone to connect as it's public key authentication funtion always

@@ -12,10 +12,13 @@ prevConnections = []
 known_users = []
 game_players = []
 
-eax_base = game.Base("EAX")
-ebx_base = game.Base("EBX")
-ecx_base = game.Base("ECX")
-edx_base = game.Base("EDX")
+at_base = game.Base("Avenger's Tower")
+bc_base = game.Base("Batman's Cave")
+ab_base = game.Base("Alpha Base")
+bb_base = game.Base("Beta Base")
+pc_base = game.Base("Pirate's Cove")
+tc_base = game.Base("The Citadel")
+ts_base = game.Base("The Stronghold")
 
 
 def get_all_instances(class_object):
@@ -26,22 +29,109 @@ def get_all_instances(class_object):
             instances.append(object)
     return instances
 
-def assign_base() -> game.Base:
-    try:
-        for base in get_all_instances(game.Base):
-            if base.owner == None:
-                return base
-
-    except Exception:
-        traceback.print_exc()
-
-    return None
-
 def search_base_object(name: str) -> game.Base:
     for base in get_all_instances(game.Base):
         if base.name.lower() == name.lower().strip():
             return base
 
+def input_handler(line, player: game.User):
+        incoming_message = line.lower().strip()
+
+        if "contest" in incoming_message:
+
+            name = incoming_message.replace("contest", "").strip()
+
+            if name == "":
+                player.proccess.stdout.write("Please specify the name of the base you wish to attack!\n\n")
+                return
+
+            base = search_base_object(name)
+
+            try:
+                player.army.attack_base(base)
+            except Exception:
+                traceback.print_exc()
+
+            return
+
+        if "buy infantry" in incoming_message:
+            data = incoming_message.replace("buy infantry", "").strip()
+
+            if data == "":
+                player.proccess.stdout.write("Please specify how many infantry you wish to buy!\n\n")
+                return
+
+            try:
+                amount = int(data)
+
+            except Exception:
+                player.proccess.stdout.write("Please only use integers!\n\n")
+                return
+
+            try:
+                player.army.buy_infantry(amount)
+            except Exception:
+                traceback.print_exc()
+
+            return
+
+        if "balance" in incoming_message:
+            player.check_balance()
+            return
+
+        if "infantry" in incoming_message:
+            player.army.check_infantry()
+            return
+
+        if "buy armour levels" in  incoming_message:
+            data = incoming_message.replace("buy armour levels", "").strip()
+
+            if data == "":
+                player.proccess.stdout.write("Please specify how many levels of armour you wish to buy!\n")
+                return
+
+            try:
+                amount = int(data)
+
+            except Exception:
+                player.proccess.stdout.write("Please only use integers!\n")
+                return
+
+            try:
+                player.army.upgrade_armour(amount)
+            except Exception:
+                traceback.print_exc()
+
+            return
+
+        if "armour level" in incoming_message:
+            player.army.check_armour_level()
+            return
+
+
+        if "my bases" in incoming_message:
+            player.proccess.stdout.write("List of all your bases:\n")
+
+            bases = game.Base.fetch_user_bases(player)
+
+            for base in bases:
+                player.proccess.stdout.write(f"    - {base.name}\n")
+
+            player.proccess.stdout.write("\n")
+
+            return
+        
+        if "bases" in incoming_message:
+            player.proccess.stdout.write("List of all bases:\n")
+            bases = game.Base.fetch_bases()
+            
+            for base in bases:
+                player.proccess.stdout.write(f"    - {base.name}\n")
+
+            player.proccess.stdout.write("\n")
+
+            return
+        
 async def handle_client(proccess: asyncssh.SSHServerProcess):
     username = proccess.get_extra_info("username")
     proccess.stdout.write(f"Hello {username}! Welcome to \nBATTLE OF MEMORY \nBy Yahya :) \n")
@@ -65,62 +155,18 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
 
     playerInfo = known_users[len(known_users) - 1]
 
-    player = game.User(proccess, playerInfo["key"], home_base=assign_base())
+    player = game.User(proccess, playerInfo["key"])
     player.claim_homebase()
+    player.begin_minutely_money()
 
     async for line in proccess.stdin:
-        incoming_message = line.lower().strip()
+        clean_data = line.lower().strip()
 
-        if "contest" in incoming_message:
-
-            name = incoming_message.replace("contest", "").strip()
-
-            if name == "":
-                player.proccess.stdout.write("Please specify the name of the base you wish to attack!\n")
-                return
-
-            base = search_base_object(name)
-
-            try:
-                player.army.attack_base(base)
-            except Exception:
-                traceback.print_exc()
-
-        if "buy infantry" in incoming_message:
-            data = incoming_message.replace("buy infantry", "").strip()
-
-            if data == "":
-                player.proccess.stdout.write("Please specify how many infantry you wish to buy!\n")
-                return
-
-            try:
-                amount = int(data)
-
-            except Exception:
-                player.proccess.stdout.write("Please only use integers!\n")
-                print("type failiar")
-                return
-
-            print(f"amount: {amount}")
-
-            try:
-                player.army.buy_infantry(amount)
-            except Exception:
-                traceback.print_exc()
-
-        if "balance" in incoming_message:
-            player.check_balance()
-
-        if "infantry" in incoming_message:
-            player.army.check_infantry()
-
-        
+        input_handler(clean_data, player)
     
     #proccess.exit(0)
 
     #game.User(proccess)
-
-
 
 class Server(asyncssh.SSHServer):
     def connection_made(self, conn: asyncssh.SSHServerConnection):

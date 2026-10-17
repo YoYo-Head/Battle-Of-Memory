@@ -7,8 +7,7 @@
 * combat type of game
 
 # Version 1:
-1. Small tutorial for first time joiners (detectected via SSH key)
-2. You have money, a base, and troops
-3. You buy troops with money
-4. Base defences upgrades with money
-5. Amount of bases earns money
+DONE 1. You have money, a base, and troops
+DONE 2. You buy troops with money
+DONE 3. Infantry armour upgrades with money
+4. Amount of bases earns money
