@@ -10,4 +10,4 @@
 DONE 1. You have money, a base, and troops
 DONE 2. You buy troops with money
 DONE 3. Infantry armour upgrades with money
-4. Amount of bases earns money
+DONE 4. Amount of bases earns money
