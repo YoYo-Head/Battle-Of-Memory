@@ -1,7 +1,18 @@
 ## Battle of Memory
 
 # How to connect
-**SSH Command:** ssh -p 2222 blah.blah
+**SSH Command:** ssh -6 -p 2222 yoyo-head123@2a01:4f9:3080:3192::2051
+**Requirements:**
+1. You must have IPv6 connectivity on your device.
+2. You must have a public ssh key generated on your device.
+
+If you are unsure whether your device has IPv6 connectivity, head over to `https://test-ipv6.com` and see whether you past their test.
+
+To generate an ssh public key run the following:
+
+> ssh-keygen -t ed25519
+
+Once you run that command, you can simply press *enter* for all other inputs.
 
 To connect to the SSH server, you first must open up a terminal. Once opened, you can simply put paste the *SSH Command* mentioned above.
 
