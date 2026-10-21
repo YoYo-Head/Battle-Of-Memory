@@ -5,6 +5,7 @@ import game
 from typing import Optional
 import traceback
 import gc
+from rich.console import Console
 
 port = 2222
 
@@ -34,6 +35,8 @@ def search_base_object(name: str) -> game.Base:
         if base.name.lower() == name.lower().strip():
             return base
 
+    return None
+
 def input_handler(line, player: game.User):
         incoming_message = line.lower().strip()
 
@@ -46,6 +49,10 @@ def input_handler(line, player: game.User):
                 return
 
             base = search_base_object(name)
+
+            if base == None:
+                player.proccess.stdout.write("That base doesn't exist!\nPlease double check base names through 'bases'.\n\n")
+                return
 
             try:
                 player.army.attack_base(base)
@@ -109,7 +116,7 @@ def input_handler(line, player: game.User):
             return
 
 
-        if "my bases" in incoming_message:
+        if "my bases" == incoming_message:
             player.proccess.stdout.write("List of all your bases:\n")
 
             bases = game.Base.fetch_user_bases(player)
@@ -147,26 +154,26 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
 
         if oldUser:
             break
+    
 
     if not oldUser:
         print(f"New user {username}!")
-
         known_users.append(prevConnections[len(prevConnections) - 1])
 
     playerInfo = known_users[len(known_users) - 1]
-
+    
     player = game.User(proccess, playerInfo["key"])
+    
     player.claim_homebase()
     player.begin_minutely_money()
+    
 
     async for line in proccess.stdin:
         clean_data = line.lower().strip()
 
         input_handler(clean_data, player)
-    
-    #proccess.exit(0)
 
-    #game.User(proccess)
+    proccess.exit(0)
 
 class Server(asyncssh.SSHServer):
     def connection_made(self, conn: asyncssh.SSHServerConnection):

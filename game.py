@@ -4,6 +4,9 @@ import traceback
 import threading
 import gc
 import time
+from rich.console import Console
+
+
 
 def get_all_instances(class_object):
     instances = []
@@ -33,6 +36,7 @@ class User:
         self.proccess = proccess
         self.username = proccess.get_extra_info("username")
         self.key = key
+        self.console = Console(file=proccess.stdout)
 
         found_name = True
         format = ""
@@ -45,6 +49,7 @@ class User:
                 format = f"{self.username}'s Base"
 
             found_name = Base.base_with_name(format)
+            counter += 1
 
         self.home_base = Base(format)
         self.army = Army(army_power, self, 50, self.home_base)
@@ -59,7 +64,7 @@ class User:
 
 
     def check_balance(self):
-        self.proccess.stdout.write(f"You have ${self.balance}.\n\n")
+        self.console.print(f"You have ${self.balance}.\n\n")
 
     def remove():
         pass
@@ -80,13 +85,15 @@ class Army:
             base.change_ownership(self.owner)
             return
 
+        
+
         enemy_army = base.owner.army
 
         eInfantry_lost = enemy_army.take_damage(self.infantry, self.owner)
 
         sInfantry_lost = self.take_damage(enemy_army.infantry, base.owner)
-
-        self.owner.proccess.stdout.write(f"Your army killed {eInfantry_lost} infantry.\nYour lost {sInfantry_lost} infantry.\n\n")
+        base.owner.proccess.stdout.write(f"!!! YOUR BASE ({base.name.upper()}) IS UNDER ATTACK !!!\n!!! {self.owner.username.upper()}'S ARMY HAS KILLED {eInfantry_lost} INFANTRY OF YOUR ARMY !!!\n\n")
+        self.owner.proccess.stdout.write(f"Your army killed {eInfantry_lost} infantry.\nYou lost {sInfantry_lost} infantry.\n\n")
 
     def buy_infantry(self, amount: int):
         cost_per_person = 20
@@ -126,6 +133,8 @@ class Army:
         self.infantry -= damage
     
         if self.infantry <= 0:
+            damage += self.infantry
+
             self.infantry = 0
             self.base.change_ownership(attacker)
 
@@ -143,6 +152,16 @@ class Base:
         self.name = name
 
     def change_ownership(self, user: User):
+        try:
+            if self.owner.home_base == self:
+                self.owner.proccess.stdout.write("You have lost the game since you've lost your homebase!\n")
+                self.owner.proccess.exit(0)
+            else:
+                self.owner.proccess.stdout(f"You have just lost {self.name}!\n\n")
+        except Exception:
+            traceback.print_exc()
+
+
         user.proccess.stdout.write("Congrats! You now own " + self.name + ".\n\n")
 
         self.owner = user
@@ -176,8 +195,6 @@ class Base:
                 return True
 
         return False        
-
-
     
     def destroy(self):
         self = None
