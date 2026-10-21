@@ -4,8 +4,6 @@ import traceback
 import threading
 import gc
 import time
-from rich.console import Console
-
 
 
 def get_all_instances(class_object):
@@ -36,10 +34,8 @@ class User:
         self.proccess = proccess
         self.username = proccess.get_extra_info("username")
         self.key = key
-        self.console = Console(file=proccess.stdout)
 
         found_name = True
-        format = ""
         counter = 0
 
         while found_name:
@@ -64,7 +60,7 @@ class User:
 
 
     def check_balance(self):
-        self.console.print(f"You have ${self.balance}.\n\n")
+        self.proccess.stdout.write(f"\033[32mYou have ${self.balance}. \033[0m \n\n")
 
     def remove():
         pass

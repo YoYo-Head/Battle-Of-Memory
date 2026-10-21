@@ -5,7 +5,6 @@ import game
 from typing import Optional
 import traceback
 import gc
-from rich.console import Console
 
 port = 2222
 
@@ -141,7 +140,7 @@ def input_handler(line, player: game.User):
         
 async def handle_client(proccess: asyncssh.SSHServerProcess):
     username = proccess.get_extra_info("username")
-    proccess.stdout.write(f"Hello {username}! Welcome to \nBATTLE OF MEMORY \nBy Yahya :) \n")
+    proccess.stdout.write(f"Hello {username}! Welcome to \n\033[35;1;35mBATTLE OF MEMORY\033[0m \nBy Yahya :) \n")
 
     oldUser = False
 
