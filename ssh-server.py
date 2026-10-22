@@ -47,7 +47,7 @@ def input_handler(line, player: game.User):
                 player.proccess.stdout.write("Please specify the name of the base you wish to attack!\n\n")
                 return
 
-            base = search_base_object(name)
+            base = game.Base.fetch_base(name)
 
             if base == None:
                 player.proccess.stdout.write("That base doesn't exist!\nPlease double check base names through 'bases'.\n\n")

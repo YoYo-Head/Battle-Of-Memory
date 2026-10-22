@@ -4,6 +4,9 @@ import traceback
 import threading
 import gc
 import time
+from colorist import Color, Effect
+
+Effect.BOLD_OFF = Effect.BOLD_OFF + Effect.UNDERLINE_OFF
 
 
 def get_all_instances(class_object):
@@ -60,7 +63,9 @@ class User:
 
 
     def check_balance(self):
-        self.proccess.stdout.write(f"\033[32mYou have ${self.balance}. \033[0m \n\n")
+        print(Effect.BOLD_OFF.upper())
+
+        self.proccess.stdout.write(f"{Color.GREEN}You have {Effect.BOLD}${self.balance}{Effect.BOLD_OFF}.{Color.OFF}\n\n")
 
     def remove():
         pass
@@ -145,12 +150,12 @@ class Base:
     def __init__(self, name: str, owner: User = None):
 
         self.owner = owner
-        self.name = name
+        self.name = self.get_formatted_name(name)
 
     def change_ownership(self, user: User):
         try:
             if self.owner.home_base == self:
-                self.owner.proccess.stdout.write("You have lost the game since you've lost your homebase!\n")
+                self.owner.proccess.stdout.write(f"{Color.RED}You have lost the game since you've lost your homebase!{Color.OFF}\n")
                 self.owner.proccess.exit(0)
             else:
                 self.owner.proccess.stdout(f"You have just lost {self.name}!\n\n")
@@ -182,15 +187,28 @@ class Base:
 
     @classmethod
     def base_with_name(cls, name: str) -> bool:
-        bases = get_all_instances(cls)
-
         bases = cls.fetch_bases()
 
         for base in bases:
-            if base.name == name:
+            if base.name == cls.get_formatted_name(name):
                 return True
 
-        return False        
+        return False
+
+    @classmethod
+    def fetch_base(cls, name: str) -> Base:
+        bases = cls.fetch_bases()
+
+        for base in bases:
+
+            if base.name.lower() == cls.get_formatted_name(name):
+                return base
+
+        return None        
+
+    @classmethod
+    def get_formatted_name(cls, name) -> str:
+        return Color.CYAN + name + Color.OFF   
     
     def destroy(self):
         self = None
