@@ -93,7 +93,10 @@ class Army:
         eInfantry_lost = enemy_army.take_damage(self.infantry, self.owner)
 
         sInfantry_lost = self.take_damage(enemy_army.infantry, base.owner)
-        base.owner.proccess.stdout.write(f"{Color.YELLOW}!!! YOUR BASE ({base.name.upper()}){Color.YELLOW} IS UNDER ATTACK !!!\n!!! {self.owner.username.upper()}'S ARMY HAS KILLED {eInfantry_lost} INFANTRY OF YOUR ARMY !!!{Color.OFF}\n\n")
+       
+        string = f"{Color.RED}!!! YOUR BASE ({base.name}){Color.RED} IS UNDER ATTACK !!!\n!!! {self.owner.username.upper()}'S ARMY HAS KILLED {eInfantry_lost} INFANTRY OF YOUR ARMY !!!{Color.OFF}\n\n"
+        print(string)
+        base.owner.proccess.stdout.write(string)
         self.owner.proccess.stdout.write(f"Your army killed {eInfantry_lost} infantry.\nYou lost {sInfantry_lost} infantry.\n\n")
 
     def buy_infantry(self, amount: int):
@@ -208,7 +211,7 @@ class Base:
 
     @classmethod
     def get_formatted_name(cls, name) -> str:
-        return Color.CYAN + name
+        return "\033[36m" + name + "\033[0m"
     
     def destroy(self):
         self = None
