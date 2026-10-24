@@ -5,7 +5,7 @@ import game
 from typing import Optional
 import traceback
 import gc
-from colorist import Color, Effect
+from colorist import Color, Effect, BrightColor
 
 port = 2222
 
@@ -45,13 +45,13 @@ def input_handler(line, player: game.User):
             name = incoming_message.replace("contest", "").strip()
 
             if name == "":
-                player.proccess.stdout.write("Please specify the name of the base you wish to attack!\n\n")
+                player.proccess.stdout.write(f"{Color.RED}Please specify the name of the base you wish to attack!{Color.OFF}\n\n")
                 return
 
             base = game.Base.fetch_base(name)
 
             if base == None:
-                player.proccess.stdout.write("That base doesn't exist!\nPlease double check base names through 'bases'.\n\n")
+                player.proccess.stdout.write(f"{Color.RED}That base doesn't exist!\nPlease double check base names through 'bases'.{Color.OFF}\n\n")
                 return
 
             try:
@@ -65,14 +65,14 @@ def input_handler(line, player: game.User):
             data = incoming_message.replace("buy infantry", "").strip()
 
             if data == "":
-                player.proccess.stdout.write("Please specify how many infantry you wish to buy!\n\n")
+                player.proccess.stdout.write(f"{Color.RED}Please specify how many infantry you wish to buy!{Color.OFF}\n\n")
                 return
 
             try:
                 amount = int(data)
 
             except Exception:
-                player.proccess.stdout.write("Please only use integers!\n\n")
+                player.proccess.stdout.write(f"{Color.RED}Please only use integers!{Color.OFF}\n\n")
                 return
 
             try:
@@ -94,14 +94,14 @@ def input_handler(line, player: game.User):
             data = incoming_message.replace("buy armour levels", "").strip()
 
             if data == "":
-                player.proccess.stdout.write("Please specify how many levels of armour you wish to buy!\n")
+                player.proccess.stdout.write(f"{Color.RED}Please specify how many levels of armour you wish to buy!{Color.OFF}\n")
                 return
 
             try:
                 amount = int(data)
 
             except Exception:
-                player.proccess.stdout.write("Please only use integers!\n")
+                player.proccess.stdout.write(f"{Color.RED}Please only use integers!{Color.OFF}\n")
                 return
 
             try:
@@ -117,27 +117,30 @@ def input_handler(line, player: game.User):
 
 
         if "my bases" == incoming_message:
-            player.proccess.stdout.write("List of all your bases:\n")
+            player.proccess.stdout.write(f"{BrightColor.YELLOW}List of all your bases:{Color.OFF}\n")
 
             bases = game.Base.fetch_user_bases(player)
 
             for base in bases:
-                player.proccess.stdout.write(f"    - {base.name}\n")
+                player.proccess.stdout.write(f"    {BrightColor.YELLOW}-{Color.OFF} {base.name}\n")
 
             player.proccess.stdout.write("\n")
 
             return
         
         if "bases" in incoming_message:
-            player.proccess.stdout.write("List of all bases:\n")
+            player.proccess.stdout.write(f"{BrightColor.YELLOW}List of all bases:{Color.OFF}\n")
             bases = game.Base.fetch_bases()
             
             for base in bases:
-                player.proccess.stdout.write(f"    - {base.name}\n")
+                player.proccess.stdout.write(f"    {BrightColor.YELLOW}-{Color.OFF} {base.name}\n")
 
             player.proccess.stdout.write("\n")
 
             return
+
+        if "exit" == incoming_message:
+            player.exit()
         
 async def handle_client(proccess: asyncssh.SSHServerProcess):
     username = proccess.get_extra_info("username")
@@ -180,9 +183,11 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
     proccess.exit(0)
 
 class Server(asyncssh.SSHServer):
+    conn = ""
     def connection_made(self, conn: asyncssh.SSHServerConnection):
         peername = conn.get_extra_info("peername")[0]
         print(f"Recieved SSH connection from {peername}")
+        self.conn = conn
         
 
     def connection_lost(self, exc: Optional[Exception]):

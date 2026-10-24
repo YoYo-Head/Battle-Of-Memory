@@ -4,7 +4,7 @@ import traceback
 import threading
 import gc
 import time
-from colorist import Color, Effect
+from colorist import Color, Effect, BrightColor
 
 Effect.BOLD_OFF = Effect.BOLD_OFF + Effect.UNDERLINE_OFF
 
@@ -63,9 +63,11 @@ class User:
 
 
     def check_balance(self):
-        print(Effect.BOLD_OFF.upper())
+        self.proccess.stdout.write(f"{BrightColor.YELLOW}You have {Color.GREEN}{Effect.BOLD}${self.balance}{Effect.BOLD_OFF}{BrightColor.YELLOW}.{Color.OFF}\n\n")
 
-        self.proccess.stdout.write(f"{Color.GREEN}You have {Effect.BOLD}${self.balance}{Effect.BOLD_OFF}.{Color.OFF}\n\n")
+    def exit(self):
+        self.proccess.stdout.write(f"{Effect.OFF}{Color.RED}Leaving the game...{Color.OFF}\n\n")
+        self.proccess.exit(0)
 
     def remove():
         pass
@@ -79,7 +81,7 @@ class Army:
 
     def attack_base(self, base: Base):
         if base.owner == self.owner:
-            self.owner.proccess.stdout.write("You can't attack your own base!\n\n")
+            self.owner.proccess.stdout.write(f"{Color.RED}You can't attack your own base!{Color.OFF}\n\n")
             return
 
         if base.owner == None:
@@ -94,9 +96,9 @@ class Army:
 
         sInfantry_lost = self.take_damage(enemy_army.infantry, base.owner)
        
-        string = f"{Color.YELLOW}!!! YOUR BASE ({base.name}{Color.YELLOW}) IS UNDER ATTACK !!!\n!!! {self.owner.username.upper()}'S ARMY HAS KILLED {eInfantry_lost} INFANTRY OF YOUR ARMY !!!{Color.OFF}\n\n"
+        string = f"\033[2K\n{Color.OFF}{Color.YELLOW}!!! YOUR BASE ({base.name}{Color.YELLOW}) IS UNDER ATTACK !!!\n!!! {self.owner.username.upper()}'S ARMY HAS KILLED {eInfantry_lost} INFANTRY OF YOUR ARMY !!!{Color.OFF}\n\n{Color.MAGENTA}> {Color.OFF}{Effect.BOLD}"
         base.owner.proccess.stdout.write(string)
-        self.owner.proccess.stdout.write(f"Your army killed {eInfantry_lost} infantry.\nYou lost {sInfantry_lost} infantry.\n\n")
+        self.owner.proccess.stdout.write(f"{BrightColor.YELLOW}Your army killed {Effect.BOLD}{eInfantry_lost}{Effect.BOLD_OFF} infantry.\nYou lost {Effect.BOLD}{sInfantry_lost}{Effect.OFF}{BrightColor.YELLOW} infantry.\n\n")
 
     def buy_infantry(self, amount: int):
         cost_per_person = 20
@@ -104,13 +106,13 @@ class Army:
         price = amount * cost_per_person
 
         if self.owner.balance < price:
-            self.owner.proccess.stdout.write("You don't have enough money to buy " + str(amount) + " infantry!\n\n")
+            self.owner.proccess.stdout.write(f"{Color.RED}You don't have enough money to buy " + str(amount) + f" infantry!{Color.OFF}\n\n")
             return
 
         self.owner.balance -= price
         self.infantry += amount
 
-        self.owner.proccess.stdout.write(f"You have now bought an extra {amount} infantry!\nThis action costed ${price}.\nYou now have ${self.owner.balance}.\n\n")
+        self.owner.proccess.stdout.write(f"{BrightColor.YELLOW}You have now bought an extra {Color.GREEN}{amount}{BrightColor.YELLOW} infantry!\nThis action costed {Color.GREEN}${price}{BrightColor.YELLOW}.\nYou now have {Color.GREEN}${self.owner.balance}{BrightColor.YELLOW}.{Color.OFF}\n\n")
 
     def upgrade_armour(self, amount: int):
         cost_per_level = 5
@@ -118,16 +120,16 @@ class Army:
         price = amount * cost_per_level
 
         if self.owner.balance < price:
-            self.owner.proccess.stdout.write("You don't have enough money to buy " + str(amount) + " levels of armour!\n\n")
+            self.owner.proccess.stdout.write(f"{Color.RED}You don't have enough money to buy " + str(amount) + F" levels of armour!{Color.OFF}\n\n")
             return
         
         self.owner.balance -= price
         self.armour += amount
         
-        self.owner.proccess.stdout.write(f"You have now bought an extra {amount} levels of armour!\nThis action costed ${price}.\nYou now have ${self.owner.balance}.\n\n")
+        self.owner.proccess.stdout.write(f"{BrightColor.YELLOW}You have now bought an extra {Color.GREEN}{amount}{BrightColor.YELLOW} levels of armour!\nThis action costed {Color.GREEN}${price}{BrightColor.YELLOW}.\nYou now have {Color.GREEN}${self.owner.balance}{BrightColor.YELLOW}.{Color.OFF}\n\n")
 
     def check_infantry(self):
-        self.owner.proccess.stdout.write(f"You have {self.infantry} infantry.\n\n")
+        self.owner.proccess.stdout.write(f"{BrightColor.YELLOW}You have {Color.GREEN}{self.infantry}{BrightColor.YELLOW} infantry.{Color.OFF}\n\n")
 
 
     def take_damage(self, attack_power: int, attacker: User):
@@ -146,7 +148,7 @@ class Army:
         return damage
 
     def check_armour_level(self):
-        self.owner.proccess.stdout.write(f"You have level {self.armour} armour.\n\n")
+        self.owner.proccess.stdout.write(f"{BrightColor.YELLOW}You have level {Color.GREEN}{self.armour}{BrightColor.YELLOW} armour.{Color.OFF}\n\n")
 
 class Base:
     def __init__(self, name: str, owner: User = None):
@@ -160,12 +162,12 @@ class Base:
                 self.owner.proccess.stdout.write(f"{Color.RED}You have lost the game since you've lost your homebase!{Color.OFF}\n")
                 self.owner.proccess.exit(0)
             else:
-                self.owner.proccess.stdout(f"You have just lost {self.name}!\n\n")
+                self.owner.proccess.stdout(f"{Color.RED}You have just lost {self.name}{Color.RED}!{Color.OFF}\n\n")
         except Exception:
             traceback.print_exc()
 
 
-        user.proccess.stdout.write("Congrats! You now own " + self.name + ".\n\n")
+        user.proccess.stdout.write(f"{BrightColor.GREEN}Congrats! You now own " + self.name + f"{BrightColor.GREEN}.{Color.OFF}\n\n")
 
         self.owner = user
 

@@ -27,6 +27,7 @@ Once you've loaded into the server, there is quite a few things you can do. Here
 - **armour level** -> Shows you level of armour.
 - **buy armour levels [AMOUNT]** -> Buys more armour levels.
 - **my bases** -> Shows the bases you own.
+- **exit** -> Disconnects you from the server and also removes any ANSI codes.
 
 As soon as you load you, you should automatically recieve a base (which will be referred to as your home base), $100 and 100 infantry. Also,
 you should be getting $50 for every base you own per minute.
