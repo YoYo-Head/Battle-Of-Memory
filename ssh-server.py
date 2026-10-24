@@ -5,6 +5,7 @@ import game
 from typing import Optional
 import traceback
 import gc
+from colorist import Color, Effect
 
 port = 2222
 
@@ -166,11 +167,15 @@ async def handle_client(proccess: asyncssh.SSHServerProcess):
     player.claim_homebase()
     player.begin_minutely_money()
     
+    player.proccess.stdout.write(f"{Color.MAGENTA}> {Color.OFF}{Effect.BOLD}")
 
     async for line in proccess.stdin:
+        player.proccess.stdout.write(Effect.OFF)
         clean_data = line.lower().strip()
 
         input_handler(clean_data, player)
+
+        player.proccess.stdout.write(f"{Color.MAGENTA}> {Color.OFF}{Effect.BOLD}")
 
     proccess.exit(0)
 

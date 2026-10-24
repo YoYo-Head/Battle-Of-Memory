@@ -94,8 +94,7 @@ class Army:
 
         sInfantry_lost = self.take_damage(enemy_army.infantry, base.owner)
        
-        string = f"{Color.RED}!!! YOUR BASE ({base.name}){Color.RED} IS UNDER ATTACK !!!\n!!! {self.owner.username.upper()}'S ARMY HAS KILLED {eInfantry_lost} INFANTRY OF YOUR ARMY !!!{Color.OFF}\n\n"
-        print(string)
+        string = f"{Color.YELLOW}!!! YOUR BASE ({base.name}{Color.YELLOW}) IS UNDER ATTACK !!!\n!!! {self.owner.username.upper()}'S ARMY HAS KILLED {eInfantry_lost} INFANTRY OF YOUR ARMY !!!{Color.OFF}\n\n"
         base.owner.proccess.stdout.write(string)
         self.owner.proccess.stdout.write(f"Your army killed {eInfantry_lost} infantry.\nYou lost {sInfantry_lost} infantry.\n\n")
 
